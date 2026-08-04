@@ -8,6 +8,7 @@ const items = [
   { to: "/reparaciones", icon: "bi-wrench-adjustable", label: "Reparaciones" },
   { to: "/pedidos", icon: "bi-receipt", label: "Pedidos" },
   { to: "/clientes", icon: "bi-people", label: "Clientes" },
+  { to: "/caja", icon: "bi-cash-coin", label: "Caja" },
   { to: "/chatbot", icon: "bi-chat-dots", label: "Chatbot" },
 ];
 
