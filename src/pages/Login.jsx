@@ -32,9 +32,9 @@ export default function Login() {
           <div className="col-md-6 p-5">
             <div
               className="icon-circle mb-4"
-              style={{ background: "var(--gradient-cta)", width: 52, height: 52 }}
+              style={{ background: "var(--gradient-cta)", width: 73, height: 73 }}
             >
-              <i className="bi bi-cpu fs-4 text-white" />
+              <img className="img-login" src="/favicon.svg" alt="Logo" style={{ width: 72, height: 72 }} />
             </div>
             <h1 className="display-4 mb-3">Bienvenido</h1>
             <div style={{ width: 60, height: 3, background: "var(--gradient-cta)" }} className="mb-4" />

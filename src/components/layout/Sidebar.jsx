@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import logo from "/favicon.svg";
 
 const items = [
   { to: "/", icon: "bi-pie-chart", label: "Dashboard" },
@@ -24,7 +25,11 @@ export default function Sidebar() {
     >
       <div className="sidebar d-flex flex-column align-items-start py-4">
         <div className="sidebar-logo mb-5">
-          <div className="icon-circle bg-white text-dark fw-bold">TT</div>
+          <div className="icon-circle mb-4"
+              style={{ background: "var(--gradient-cta)", width: 41, height: 41 }}
+          >
+            <img src={logo} className="imgsidebar" alt="TechTree" style={{ width: 40, height: 40, objectFit: "contain" }} />
+          </div>
         </div>
 
         <div className="d-flex flex-column gap-2 flex-grow-1 w-100">

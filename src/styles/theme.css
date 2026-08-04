@@ -577,3 +577,12 @@ input.form-control {
   from { opacity: 0; transform: translateX(20px); }
   to { opacity: 1; transform: translateX(0); }
 }
+
+.img-login {
+  border-radius: 50%;
+}
+
+.imgsidebar {
+  border-radius: 50%;
+  object-fit: contain;
+}
