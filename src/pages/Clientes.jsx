@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
+import Modal from "../components/common/Modal";
 import { clientesService } from "../firebase/inventoryService";
+import { useToast } from "../context/ToastContext";
 
 const emptyForm = { nombre: "", telefono: "", email: "", direccion: "", notas: "" };
 
@@ -16,6 +18,8 @@ export default function Clientes() {
     return unsub;
   }, []);
 
+  const toast = useToast();
+
   const filtered = clientes.filter((c) =>
     [c.nombre, c.telefono, c.email]
       .filter(Boolean)
@@ -30,14 +34,20 @@ export default function Clientes() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editId) {
-      await clientesService.update(editId, form);
-    } else {
-      await clientesService.create(form);
+    try {
+      if (editId) {
+        await clientesService.update(editId, form);
+        toast.success("Actualizado", `${form.nombre} se guardó correctamente.`);
+      } else {
+        await clientesService.create(form);
+        toast.success("Cliente creado", `${form.nombre} se agregó a la lista.`);
+      }
+      setForm(emptyForm);
+      setEditId(null);
+      setShowForm(false);
+    } catch (err) {
+      toast.error("Error", "No se pudo guardar el cliente.");
     }
-    setForm(emptyForm);
-    setEditId(null);
-    setShowForm(false);
   };
 
   const handleEdit = (c) => {
@@ -48,7 +58,12 @@ export default function Clientes() {
 
   const handleDelete = async (id) => {
     if (confirm("¿Eliminar este cliente?")) {
-      await clientesService.remove(id);
+      try {
+        await clientesService.remove(id);
+        toast.info("Eliminado", "El cliente fue eliminado.");
+      } catch (err) {
+        toast.error("Error", "No se pudo eliminar el cliente.");
+      }
     }
   };
 
@@ -61,75 +76,44 @@ export default function Clientes() {
           onClick={() => {
             setForm(emptyForm);
             setEditId(null);
-            setShowForm(!showForm);
+            setShowForm(true);
           }}
         >
-          {showForm ? "Cerrar" : "+ Agregar cliente"}
+          + Agregar cliente
         </button>
       </div>
 
-      {showForm && (
-        <form onSubmit={handleSubmit} className="card-dark mb-4">
+      <Modal
+        show={showForm}
+        onClose={() => setShowForm(false)}
+        title={editId ? "Editar cliente" : "Agregar cliente"}
+      >
+        <form onSubmit={handleSubmit}>
           {telefonoDuplicado && (
             <div className="alert alert-warning py-2">
               Ya existe un cliente con este teléfono. Revisa si es la misma persona antes de guardar.
             </div>
           )}
           <div className="row g-3">
-            <div className="col-md-4">
-              <input
-                className="form-control"
-                name="nombre"
-                placeholder="Nombre completo"
-                value={form.nombre}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="col-md-4">
-              <input
-                className="form-control"
-                name="telefono"
-                placeholder="Teléfono"
-                value={form.telefono}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="col-md-4">
-              <input
-                className="form-control"
-                name="email"
-                type="email"
-                placeholder="Correo (opcional)"
-                value={form.email}
-                onChange={handleChange}
-              />
+            <div className="col-md-6">
+              <input className="form-control" name="nombre" placeholder="Nombre completo" value={form.nombre} onChange={handleChange} required />
             </div>
             <div className="col-md-6">
-              <input
-                className="form-control"
-                name="direccion"
-                placeholder="Dirección (opcional)"
-                value={form.direccion}
-                onChange={handleChange}
-              />
+              <input className="form-control" name="telefono" placeholder="Teléfono" value={form.telefono} onChange={handleChange} required />
             </div>
             <div className="col-md-6">
-              <input
-                className="form-control"
-                name="notas"
-                placeholder="Notas (opcional)"
-                value={form.notas}
-                onChange={handleChange}
-              />
+              <input className="form-control" name="email" type="email" placeholder="Correo (opcional)" value={form.email} onChange={handleChange} />
+            </div>
+            <div className="col-md-6">
+              <input className="form-control" name="direccion" placeholder="Dirección (opcional)" value={form.direccion} onChange={handleChange} />
+            </div>
+            <div className="col-12">
+              <input className="form-control" name="notas" placeholder="Notas (opcional)" value={form.notas} onChange={handleChange} />
             </div>
           </div>
-          <button className="btn btn-success mt-3">
-            {editId ? "Guardar cambios" : "Crear cliente"}
-          </button>
+          <button className="btn btn-success w-100 mt-4">{editId ? "Guardar cambios" : "Crear cliente"}</button>
         </form>
-      )}
+      </Modal>
 
       <input
         className="form-control mb-3"
