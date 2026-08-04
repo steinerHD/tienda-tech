@@ -29,7 +29,6 @@ export default function DecorativeBackground() {
           <line x1="18%" y1="0" x2="18%" y2="22%" />
           <line x1="23%" y1="0" x2="23%" y2="15%" />
           <circle cx="85%" cy="80%" r="110" />
-          <path d="M 60% 5% L 78% 22%" />
         </g>
       </svg>
     </div>
