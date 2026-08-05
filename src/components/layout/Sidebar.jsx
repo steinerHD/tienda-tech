@@ -5,12 +5,13 @@ import logo from "/favicon.svg";
 
 const items = [
   { to: "/", icon: "bi-pie-chart", label: "Dashboard" },
-  { to: "/inventario", icon: "bi-grid", label: "Inventario" },
-  { to: "/reparaciones", icon: "bi-wrench-adjustable", label: "Reparaciones" },
-  { to: "/pedidos", icon: "bi-receipt", label: "Pedidos" },
   { to: "/clientes", icon: "bi-people", label: "Clientes" },
+  { to: "/inventario", icon: "bi-grid", label: "Inventario" },
+  { to: "/pedidos", icon: "bi-receipt", label: "Pedidos" },
+  { to: "/reparaciones", icon: "bi-wrench-adjustable", label: "Reparaciones" },
   { to: "/caja", icon: "bi-cash-coin", label: "Caja" },
   { to: "/chatbot", icon: "bi-chat-dots", label: "Chatbot" },
+  { to: "/ayuda", icon: "bi-question-circle", label: "Ayuda" },
 ];
 
 export default function Sidebar() {
@@ -32,11 +33,12 @@ export default function Sidebar() {
           </div>
         </div>
 
-        <div className="d-flex flex-column gap-2 flex-grow-1 w-100">
+        <div className="d-flex pb-4 flex-column gap-2 flex-grow-1 w-100">
           {items.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.to === "/"}
               className={({ isActive }) =>
                 `sidebar-link d-flex align-items-center ${isActive ? "active" : ""}`
               }
