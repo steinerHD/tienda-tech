@@ -24,9 +24,9 @@ export default function Sidebar() {
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
     >
-      <div className="sidebar d-flex flex-column align-items-start py-4">
+      <div className="sidebar d-flex flex-column align-items-start pt-4">
         <div className="sidebar-logo mb-5">
-          <div className="icon-circle mb-4"
+          <div className="icon-circle "
               style={{ background: "var(--gradient-cta)", width: 41, height: 41 }}
           >
             <img src={logo} className="imgsidebar" alt="TechTree" style={{ width: 40, height: 40, objectFit: "contain" }} />

@@ -144,7 +144,6 @@ export default function Reparaciones() {
           <div className="row g-3 mb-3">
             <div className="col-md-3">
               <CustomSelect
-                label="Tipo"
                 value={form.equipo.tipo}
                 onChange={(val) => setForm({ ...form, equipo: { ...form.equipo, tipo: val } })}
                 options={TIPOS_EQUIPO}

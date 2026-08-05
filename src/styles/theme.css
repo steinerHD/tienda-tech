@@ -589,3 +589,7 @@ input.form-control {
   border-radius: 50%;
   object-fit: contain;
 }
+
+body {
+  overflow-x: hidden;
+}
