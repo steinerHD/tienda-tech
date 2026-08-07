@@ -8,6 +8,7 @@ import {
   query,
   orderBy,
   serverTimestamp,
+  runTransaction,
 } from "firebase/firestore";
 import { db } from "./config";
 
@@ -38,4 +39,36 @@ export async function updateReparacion(id, data) {
 
 export async function deleteReparacion(id) {
   return deleteDoc(doc(db, "reparaciones", id));
+}
+
+// Marca la reparación como entregada y descuenta el stock de los repuestos
+// usados, en una sola transacción atómica.
+export async function confirmarEntregaReparacion(reparacion) {
+  const repuestosUsados = reparacion.repuestosUsados || [];
+
+  await runTransaction(db, async (transaction) => {
+    const itemRefs = repuestosUsados.map((r) => doc(db, "repuestos", r.itemId));
+
+    const itemSnaps = [];
+    for (const ref of itemRefs) {
+      itemSnaps.push(await transaction.get(ref));
+    }
+
+    itemSnaps.forEach((snap, idx) => {
+      if (snap.exists()) {
+        const cantidad = repuestosUsados[idx].cantidad;
+        const stockActual = snap.data().stock || 0;
+        const nuevoStock = Math.max(0, stockActual - cantidad);
+        transaction.update(itemRefs[idx], {
+          stock: nuevoStock,
+          actualizadoEn: serverTimestamp(),
+        });
+      }
+    });
+
+    transaction.update(doc(db, "reparaciones", reparacion.id), {
+      estado: "entregado",
+      actualizadoEn: serverTimestamp(),
+    });
+  });
 }

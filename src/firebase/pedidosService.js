@@ -8,6 +8,7 @@ import {
   query,
   orderBy,
   serverTimestamp,
+  runTransaction,
 } from "firebase/firestore";
 import { db } from "./config";
 
@@ -42,4 +43,38 @@ export async function updatePedidoEstado(id, estado) {
 
 export async function deletePedido(id) {
   return deleteDoc(doc(db, "pedidos", id));
+}
+
+// Marca el pedido como entregado y descuenta el stock de cada ítem, todo en
+// una sola transacción atómica para evitar doble descuento por carreras.
+export async function confirmarEntregaPedido(pedido) {
+  await runTransaction(db, async (transaction) => {
+    const itemRefs = pedido.items.map((it) =>
+      doc(db, it.tipo === "producto" ? "productos" : "repuestos", it.itemId)
+    );
+
+    const itemSnaps = [];
+    for (const ref of itemRefs) {
+      itemSnaps.push(await transaction.get(ref));
+    }
+
+    itemSnaps.forEach((snap, idx) => {
+      if (snap.exists()) {
+        const cantidad = pedido.items[idx].cantidad;
+        const stockActual = snap.data().stock || 0;
+        const nuevoStock = Math.max(0, stockActual - cantidad);
+        transaction.update(itemRefs[idx], {
+          stock: nuevoStock,
+          actualizadoEn: serverTimestamp(),
+        });
+      }
+      // Si el ítem ya no existe en inventario (fue borrado), se omite sin fallar
+      // toda la transacción — el pedido igual se marca como entregado.
+    });
+
+    transaction.update(doc(db, "pedidos", pedido.id), {
+      estado: "entregado",
+      actualizadoEn: serverTimestamp(),
+    });
+  });
 }
